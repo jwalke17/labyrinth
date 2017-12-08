@@ -1,5 +1,5 @@
 "use strict";
 
 window.onload = function init() {
-    display_rand_maze("gl-canvas",[[10,10],[10,990],[990,990],[990,10]],40,80,20);
+    display_rand_maze("gl-canvas",[[0,0],[0,1000],[1000,1000],[1000,0]],40,80,20);
 };
