@@ -21,11 +21,11 @@ window.onload = function init(){
 
 function initMaze() {
     var size = [10.0, 10.0, .5];
-    var wallThickness = .2;
+    var wallThickness = .15;
     var wallHeight = .1;
-    var gapWidth = .1;
+    var gapWidth = .3;
     var gapBallast = .1;
-    var minDim = .5;
+    var minDim = .4;
     var predictability = 2;
 
     //var mazeGeo = new THREE.Geometry();
