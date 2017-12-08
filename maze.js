@@ -155,13 +155,19 @@ function generate_maze(box,gap_width,gap_ballast,min_dim,edge_thickness,predicta
 	var bot_ext = mult_vect(norm_vect(subtract_vect(box[2],box[1])),edge_thickness/2);
 	var rgt_ext = mult_vect(norm_vect(subtract_vect(box[3],box[2])),edge_thickness/2);
 	var top_ext = mult_vect(norm_vect(subtract_vect(box[0],box[3])),edge_thickness/2);
-	var corners = [
+	var disp_box = [
 		[subtract_vect(box[0],top_ext),add_vect(box[1],bot_ext)],
 		[subtract_vect(box[1],lft_ext),add_vect(box[2],rgt_ext)],
 		[subtract_vect(box[2],bot_ext),add_vect(box[3],top_ext)],
 		[subtract_vect(box[3],rgt_ext),add_vect(box[0],lft_ext)]
 	];
-	return corners.concat(subdivide_region(predictability,box,[[],[],[],[]],gap_width,gap_ballast,min_dim,edge_thickness));
+	var corners = [
+		subtract_vect(add_vect(box[0],lft_ext),top_ext),
+		subtract_vect(add_vect(box[1],bot_ext),lft_ext),
+		subtract_vect(add_vect(box[2],rgt_ext),bot_ext),
+		subtract_vect(add_vect(box[3],top_ext),rgt_ext),
+	];
+	return disp_box.concat(subdivide_region(predictability,corners,[[],[],[],[]],gap_width,gap_ballast,min_dim,edge_thickness));
 }
 
 function display_rand_maze(canvas_id,box,gap_width,gap_ballast,min_dim,edge_thickness,predictability) {
