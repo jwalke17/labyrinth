@@ -26,15 +26,16 @@ function initMaze() {
     var gapWidth = .1;
     var minDim = .5;
 
-    var mazeGeo = new THREE.Geometry();
-    var material = new THREE.MeshPhongMaterial({color: 0x00C0C0 });
+    //var mazeGeo = new THREE.Geometry();
+    var yellowMaterial = new THREE.MeshPhongMaterial({color:0xC0C000});
+    var blueMaterial = new THREE.MeshPhongMaterial({color:0x00C0C0});
 
     var baseGeo = new THREE.BoxGeometry( size[0], size[1], size[2] );
-    var baseMesh = new THREE.Mesh(baseGeo, material);
-    mazeGeo.merge(baseMesh.geometry, baseMesh.matrix);
+    var baseMesh = new THREE.Mesh(baseGeo, yellowMaterial);
+    scene.add(baseMesh);
+    //mazeGeo.merge(baseMesh.geometry, baseMesh.matrix);
 
     var wallsGeo = [];
-    var wallsMat = [];
     var wallsMesh = [];
 
     var corners = [
@@ -50,18 +51,17 @@ function initMaze() {
         calculateVertices(tempBox, mazeVertices[i], wallThickness, size[2]/2.0, (size[2]/2.0)+wallHeight);
         tempBox.verticesNeedUpdate = true;
         pushFaces(tempBox);
-        
+
         wallsGeo.push(tempBox);
-        wallsMat.push(new THREE.MeshPhongMaterial({color: 0x0C000C}));
-        wallsMesh.push(new THREE.Mesh(wallsGeo[i], wallsMat[i]));
+        wallsGeo[i].computeFaceNormals();
+        wallsMesh.push(new THREE.Mesh(wallsGeo[i], blueMaterial));
         wallsMesh[i].updateMatrix();
-        mazeGeo.merge(wallsMesh[i].geometry, wallsMesh[i].matrix);
+        scene.add(wallsMesh[i]);
     }
+    
+    //var mazeMesh = new THREE.Mesh(mazeGeo, material);
+    //scene.add(mazeMesh);
 
-    //for(var i = 0; i < )
-
-    var mazeMesh = new THREE.Mesh(mazeGeo, material);
-    scene.add(mazeMesh);
 }
 
 function pushFaces(geometry){
