@@ -24,7 +24,9 @@ function initMaze() {
     var wallThickness = .2;
     var wallHeight = .1;
     var gapWidth = .1;
+    var gapBallast = .1;
     var minDim = .5;
+    var predictability = 2;
 
     var mazeGeo = new THREE.Geometry();
     var material = new THREE.MeshPhongMaterial({color: 0x00C0C0 });
@@ -43,7 +45,7 @@ function initMaze() {
         [-size[0]/2.0, -size[1]/2.0],
         [size[0]/2.0, -size[1]/2.0],
     ];
-    var mazeVertices = generate_maze(corners,gapWidth,minDim,wallThickness);
+    var mazeVertices = generate_maze(corners,gapWidth,gapBallast,minDim,wallThickness,predictability);
 
     for(var i = 0; i < mazeVertices.length; i++){
         var tempBox = new THREE.Geometry();

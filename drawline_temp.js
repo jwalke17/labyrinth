@@ -29,3 +29,14 @@ function draw_lines(canvas_id,lines,thickness) {
 		draw_line(canvas_id,lines[i],thickness);
 	}
 }
+
+function draw_plus(canvas_id,center,thickness,size) {
+	draw_line(canvas_id,[
+		add_vect(center,[-0.5*size,0]),
+		add_vect(center,[ 0.5*size,0]),
+	],thickness);
+	draw_line(canvas_id,[
+		add_vect(center,[0,-0.5*size]),
+		add_vect(center,[0, 0.5*size]),
+	],thickness);
+}
