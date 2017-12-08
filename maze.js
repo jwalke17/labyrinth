@@ -88,59 +88,63 @@ function filter_gaps_and_scale(gaps,threshold,gap_width,full_len,gt) {
 
 function subdivide_region(corners,gaps,gap_width,min_dim,edge_thickness) {
 	var top_vector = subtract_vect(corners[3],corners[0]);
-	var bottom_vector = subtract_vect(corners[2],corners[1]);
+	var bot_vector = subtract_vect(corners[2],corners[1]);
 	var top_min_dim = min_dim/dot_prod_vect(mult_vect(norm_vect(rot_90(subtract_vect(corners[1],corners[0]))),min_dim),norm_vect(top_vector));
-	var bottom_min_dim = min_dim/dot_prod_vect(mult_vect(norm_vect(rot_90(subtract_vect(corners[3],corners[2]))),min_dim),norm_vect(bottom_vector));
+	var bot_min_dim = min_dim/dot_prod_vect(mult_vect(norm_vect(rot_90(subtract_vect(corners[3],corners[2]))),min_dim),norm_vect(bot_vector));
 	
 	var top_corner;
+	var bot_corner;
 	var top_pos;
-	[top_corner,top_pos] = point_between(corners[0],corners[3],[[0,edge_thickness/2+min_dim]].concat(create_avoid_list(gaps[0],gap_width)).concat([[1,edge_thickness/2+min_dim]]),edge_thickness/2);
-	var bottom_corner;
-	var bottom_pos;
-	[bottom_corner,bottom_pos] = point_between(corners[1],corners[2],[[0,edge_thickness/2+min_dim]].concat(create_avoid_list(gaps[2],gap_width)).concat([[1,edge_thickness/2+min_dim]]),edge_thickness/2);
+	var bot_pos;
+	var top_avoid = [[0,edge_thickness/2+min_dim]].concat(create_avoid_list(gaps[0],gap_width)).concat([[1,edge_thickness/2+min_dim]]);
+	var bot_avoid = [[0,edge_thickness/2+min_dim]].concat(create_avoid_list(gaps[2],gap_width)).concat([[1,edge_thickness/2+min_dim]]);
+	[top_corner,top_pos] = point_between(corners[0],corners[3],top_avoid,edge_thickness/2);
+	[bot_corner,bot_pos] = point_between(corners[1],corners[2],bot_avoid,edge_thickness/2);
 	
-	if(top_corner==null || bottom_corner==null) {
+	if(top_corner==null || bot_corner==null) {
 		return [];
 	}
 
 	var gap_center;
 	var gap_center_pos;
-	[gap_center,gap_center_pos] = point_between(top_corner,bottom_corner,[[0,edge_thickness/2+min_dim],[1,edge_thickness/2+min_dim]],gap_width/2);
+	[gap_center,gap_center_pos] = point_between(top_corner,bot_corner,[[0,edge_thickness/2+min_dim],[1,edge_thickness/2+min_dim]],gap_width/2);
 	if(gap_center==null) {
 		return [];
 	}
 
 	
-	var split_vector = subtract_vect(bottom_corner,top_corner);
-	var l_corners = [top_corner,corners[0],corners[1],bottom_corner];
-	var r_corners = [bottom_corner,corners[2],corners[3],top_corner];
+	var split_vector = subtract_vect(bot_corner,top_corner);
+	var l_corners = [top_corner,corners[0],corners[1],bot_corner];
+	var r_corners = [bot_corner,corners[2],corners[3],top_corner];
 	var l_gap = gap_center_pos;
 	var r_gap = 1-l_gap;
 	
 	var gap_vector = mult_vect(norm_vect(split_vector),gap_width);
 	var gap_top = subtract_vect(gap_center,mult_vect(gap_vector,0.5));
-	var gap_bottom = add_vect(gap_center,mult_vect(gap_vector,0.5));
+	var gap_bot = add_vect(gap_center,mult_vect(gap_vector,0.5));
 	var top_len = len_vect(top_vector);
-	var bottom_len = len_vect(bottom_vector);
-	var l = subdivide_region(l_corners,[[l_gap],filter_gaps_and_scale(gaps[0],top_pos,gap_width,top_len,false),gaps[1],filter_gaps_and_scale(gaps[2],bottom_pos,gap_width,bottom_len,false)],gap_width,min_dim,edge_thickness);
-	var r = subdivide_region(r_corners,[[r_gap],filter_gaps_and_scale(gaps[2],bottom_pos,gap_width,bottom_len,true),gaps[3],filter_gaps_and_scale(gaps[0],top_pos,gap_width,top_len,true)],gap_width,min_dim,edge_thickness);
-	return [[top_corner,gap_top],[gap_bottom,bottom_corner]].concat(l).concat(r);
+	var bot_len = len_vect(bot_vector);
+	var l = subdivide_region(l_corners,[[l_gap],filter_gaps_and_scale(gaps[0],top_pos,gap_width,top_len,false),gaps[1],filter_gaps_and_scale(gaps[2],bot_pos,gap_width,bot_len,false)],gap_width,min_dim,edge_thickness);
+	var r = subdivide_region(r_corners,[[r_gap],filter_gaps_and_scale(gaps[2],bot_pos,gap_width,bot_len,true),gaps[3],filter_gaps_and_scale(gaps[0],top_pos,gap_width,top_len,true)],gap_width,min_dim,edge_thickness);
+	return [[top_corner,gap_top],[gap_bot,bot_corner]].concat(l).concat(r);
 }
 
-function generate_maze(corners,gap_width,min_dim,edge_thickness) {
-	var left_ext = mult_vect(norm_vect(subtract_vect(corners[1],corners[0])),edge_thickness/2);
-	var bottom_ext = mult_vect(norm_vect(subtract_vect(corners[2],corners[1])),edge_thickness/2);
-	var right_ext = mult_vect(norm_vect(subtract_vect(corners[3],corners[2])),edge_thickness/2);
-	var top_ext = mult_vect(norm_vect(subtract_vect(corners[0],corners[3])),edge_thickness/2);
-	var box = [
-		[subtract_vect(corners[0],left_ext),add_vect(corners[1],left_ext)],
-		[subtract_vect(corners[1],bottom_ext),add_vect(corners[2],bottom_ext)],
-		[subtract_vect(corners[2],right_ext),add_vect(corners[3],right_ext)],
-		[subtract_vect(corners[3],top_ext),add_vect(corners[0],top_ext)]
+function generate_maze(box,gap_width,min_dim,edge_thickness) {
+	var lft_ext = mult_vect(norm_vect(subtract_vect(box[1],box[0])),edge_thickness/2);
+	var bot_ext = mult_vect(norm_vect(subtract_vect(box[2],box[1])),edge_thickness/2);
+	var rgt_ext = mult_vect(norm_vect(subtract_vect(box[3],box[2])),edge_thickness/2);
+	var top_ext = mult_vect(norm_vect(subtract_vect(box[0],box[3])),edge_thickness/2);
+	var corners = [
+		[subtract_vect(box[0],top_ext),add_vect(box[1],bot_ext)],
+		[subtract_vect(box[1],lft_ext),add_vect(box[2],rgt_ext)],
+		[subtract_vect(box[2],bot_ext),add_vect(box[3],top_ext)],
+		[subtract_vect(box[3],rgt_ext),add_vect(box[0],lft_ext)]
 	];
-	return box.concat(subdivide_region(corners,[[],[],[],[]],gap_width,min_dim,edge_thickness));
+	return corners.concat(subdivide_region(box,[[],[],[],[]],gap_width,min_dim,edge_thickness));
 }
 
-function display_rand_maze(canvas_id,corners,gap_width,min_dim,edge_thickness) {
-	draw_lines(canvas_id,generate_maze(corners,gap_width,min_dim,edge_thickness),edge_thickness);
+function display_rand_maze(canvas_id,box,gap_width,min_dim,edge_thickness) {
+	var maze = generate_maze(box,gap_width,min_dim,edge_thickness);
+	console.log(maze);
+	draw_lines(canvas_id,maze,edge_thickness);
 }
