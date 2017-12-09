@@ -31,11 +31,15 @@ function initMaze() {
     var minDim = .4;
     var predictability = 2;
 
-    var yellowMaterial = new THREE.MeshPhongMaterial({color:0xC0C000});
-    var blueMaterial = new THREE.MeshPhongMaterial({color:0x00C0C0});
+    var textureLoader = new THREE.TextureLoader();
+    var woodTexture = textureLoader.load( "wood.jpg" );
+    woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
+
+    var woodMaterial = new THREE.MeshPhongMaterial({map: woodTexture});
+    var woodMaterial2 = new THREE.MeshPhongMaterial({color: 0x874119});
 
     var baseGeo = new THREE.BoxGeometry( size[0], size[1], size[2] );
-    baseMesh = new Physijs.BoxMesh(baseGeo, yellowMaterial, 0);
+    baseMesh = new Physijs.BoxMesh(baseGeo, woodMaterial, 0);
 
     var wallsGeo = [];
 
@@ -55,7 +59,7 @@ function initMaze() {
 
         wallsGeo.push(tempBox);
         wallsGeo[i].computeFaceNormals();
-        wallsMesh.push(new Physijs.ConvexMesh(wallsGeo[i], blueMaterial));
+        wallsMesh.push(new Physijs.ConvexMesh(wallsGeo[i], woodMaterial2));
         wallsMesh[i].updateMatrix();
         baseMesh.add(wallsMesh[i]);
     }
@@ -63,9 +67,9 @@ function initMaze() {
     scene.add(baseMesh);
 
     var ballGeo = new THREE.SphereGeometry(0.075, 12, 12);
-    var ballMaterial = new THREE.MeshPhongMaterial({color: 0xDDDDDD});
+    var ballMaterial = new THREE.MeshPhongMaterial({color: 0x888888});
     ballMesh = new Physijs.SphereMesh(ballGeo, ballMaterial);
-    ballMesh.position.set(-4.5, 4.5, 0.5);
+    ballMesh.position.set(-4.6, 4.6, 0.5);
     scene.add(ballMesh);
 
 }
@@ -131,6 +135,20 @@ function initTHREE() {
     light2.position.set(0, -10, 0);
     scene.add(light2);
 
+    var light3 = new THREE.AmbientLight(0x222222);
+    scene.add(light3);
+
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    /*var controls = new THREE.TrackballControls( camera );
+    controls.rotateSpeed = 1.0;
+    controls.zoomSpeed = 1.2;
+    controls.panSpeed = 0.8;
+    controls.noZoom = false;
+    controls.noPan = false;
+    controls.staticMoving = true;
+    controls.dynamicDampingFactor = 0.3;
+    controls.keys = [ 65, 83, 68 ];
+    controls.addEventListener( 'change', render );*/
 }
 
 function animate(){
@@ -145,13 +163,13 @@ function updateTHREE(){
 
 function keyPressHandler(e) {
     var keyCode = e.keyCode ? e.keyCode : e.which;
-    if (keyCode == 115) {
+    if (keyCode == 115 && angleX < 0.1) {
         angleX += 0.002;
-    } else if (keyCode == 119) {
+    } else if (keyCode == 119 && angleX > -0.1) {
         angleX -= 0.002;
-    } else if (keyCode == 100) {
+    } else if (keyCode == 100 && angleY < 0.1) {
         angleY += 0.002;
-    } else if (keyCode == 97) {
+    } else if (keyCode == 97 && angleY > -0.1) {
         angleY -= 0.002;
     }
 }
@@ -165,4 +183,9 @@ function render(){
 
     scene.simulate();
     renderer.render(scene, camera);
+
+    if (ballMesh.position.x > 4.5 && ballMesh.position.y < -4.5) {
+        alert("Congratulations! You won!");
+        location.reload();
+    }
 }
