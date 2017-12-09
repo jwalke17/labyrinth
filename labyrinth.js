@@ -1,44 +1,43 @@
 "use strict";
 
+Physijs.scripts.worker = "physijs_worker.js";
+Physijs.scripts.ammo = "ammo.js";
+
 var scene;
 var renderer;
-var world;
 var camera;
-var cube;
+var baseMesh;
+var wallsMesh = [];
+var ballMesh;
 
-var maze;
+var angleX = 0;
+var angleY = 0;
 
 window.onload = function init(){
-
     initTHREE();
-
     initMaze();
 
+    document.addEventListener("keypress", keyPressHandler, false);
+
     animate();
-
-
 }
 
 function initMaze() {
     var size = [10.0, 10.0, .5];
     var wallThickness = .15;
     var wallHeight = .1;
-    var gapWidth = .3;
+    var gapWidth = .4;
     var gapBallast = .1;
     var minDim = .4;
     var predictability = 2;
 
-    //var mazeGeo = new THREE.Geometry();
     var yellowMaterial = new THREE.MeshPhongMaterial({color:0xC0C000});
     var blueMaterial = new THREE.MeshPhongMaterial({color:0x00C0C0});
 
     var baseGeo = new THREE.BoxGeometry( size[0], size[1], size[2] );
-    var baseMesh = new THREE.Mesh(baseGeo, yellowMaterial);
-    scene.add(baseMesh);
-    //mazeGeo.merge(baseMesh.geometry, baseMesh.matrix);
+    baseMesh = new Physijs.BoxMesh(baseGeo, yellowMaterial, 0);
 
     var wallsGeo = [];
-    var wallsMesh = [];
 
     var corners = [
         [size[0]/2.0, size[1]/2.0],
@@ -56,13 +55,18 @@ function initMaze() {
 
         wallsGeo.push(tempBox);
         wallsGeo[i].computeFaceNormals();
-        wallsMesh.push(new THREE.Mesh(wallsGeo[i], blueMaterial));
+        wallsMesh.push(new Physijs.ConvexMesh(wallsGeo[i], blueMaterial));
         wallsMesh[i].updateMatrix();
-        scene.add(wallsMesh[i]);
+        baseMesh.add(wallsMesh[i]);
     }
-    
-    //var mazeMesh = new THREE.Mesh(mazeGeo, material);
-    //scene.add(mazeMesh);
+
+    scene.add(baseMesh);
+
+    var ballGeo = new THREE.SphereGeometry(0.075, 12, 12);
+    var ballMaterial = new THREE.MeshPhongMaterial({color: 0xDDDDDD});
+    ballMesh = new Physijs.SphereMesh(ballGeo, ballMaterial);
+    ballMesh.position.set(-4.5, 4.5, 0.5);
+    scene.add(ballMesh);
 
 }
 
@@ -112,7 +116,8 @@ function initTHREE() {
     var canvas = document.getElementById("my_canvas");
     var height = window.innerHeight;
     var width = window.innerWidth;
-    scene = new THREE.Scene();
+    scene = new Physijs.Scene();
+    scene.setGravity(new THREE.Vector3(0, 0, -10));
     camera = new THREE.PerspectiveCamera( 100, width / height, 1, 1000 );
     camera.position.z = 5;
     renderer = new THREE.WebGLRenderer({canvas: canvas });
@@ -138,6 +143,26 @@ function updateTHREE(){
 
 }
 
+function keyPressHandler(e) {
+    var keyCode = e.keyCode ? e.keyCode : e.which;
+    if (keyCode == 115) {
+        angleX += 0.002;
+    } else if (keyCode == 119) {
+        angleX -= 0.002;
+    } else if (keyCode == 100) {
+        angleY += 0.002;
+    } else if (keyCode == 97) {
+        angleY -= 0.002;
+    }
+}
+
 function render(){
+    baseMesh.rotation.set(angleX, angleY, 0);
+    baseMesh.__dirtyRotation = true;
+    
+    ballMesh.rotation.set(angleX, angleY, 0);
+    ballMesh.__dirtyRotation = true;
+
+    scene.simulate();
     renderer.render(scene, camera);
 }
