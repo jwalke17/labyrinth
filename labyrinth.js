@@ -123,36 +123,33 @@ function initTHREE() {
     renderer = new THREE.WebGLRenderer({canvas: canvas });
     renderer.setSize(width, height);
 
-    var light = new THREE.PointLight(0xFFFFFF, 1, 80);
+    var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
     light.position.set(0, 0, 8);
     scene.add(light);
     
-    var light2 = new THREE.PointLight(0xFFFFFF, 1, 80);
-    light2.position.set(0, -10, 0);
+    var light2 = new THREE.PointLight(0xFFFFCF, 1, 100);
+    light2.position.set(0, 0, 2);
     scene.add(light2);
 
 }
 
 function animate(){
     requestAnimationFrame(animate);
-    updateTHREE();
     render();   
 }
 
-function updateTHREE(){
-
-}
-
 function keyPressHandler(e) {
+    var angleChange = 0.02;
+    
     var keyCode = e.keyCode ? e.keyCode : e.which;
     if (keyCode == 115) {
-        angleX += 0.002;
+        angleX += angleChange;
     } else if (keyCode == 119) {
-        angleX -= 0.002;
+        angleX -= angleChange;
     } else if (keyCode == 100) {
-        angleY += 0.002;
+        angleY += angleChange;
     } else if (keyCode == 97) {
-        angleY -= 0.002;
+        angleY -= angleChange;
     }
 }
 
