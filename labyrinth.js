@@ -16,7 +16,6 @@ var angleY = 0;
 window.onload = function init(){
     initTHREE();
     initMaze();
-
     document.addEventListener("keypress", keyPressHandler, false);
 
     animate();
@@ -157,28 +156,17 @@ function animate(){
 }
 
 function keyPressHandler(e) {
-    var angleChange = 0.02;
-    
+    var angleChange = 0.02, angleMax = 0.1, angleMin = -0.1;
     var keyCode = e.keyCode ? e.keyCode : e.which;
-<<<<<<< HEAD
-    if (keyCode == 115 && angleX < 0.1) {
-        angleX += 0.002;
-    } else if (keyCode == 119 && angleX > -0.1) {
-        angleX -= 0.002;
-    } else if (keyCode == 100 && angleY < 0.1) {
-        angleY += 0.002;
-    } else if (keyCode == 97 && angleY > -0.1) {
-        angleY -= 0.002;
-=======
-    if (keyCode == 115) {
+
+    if (keyCode == 115 && angleX < angleMax) {
         angleX += angleChange;
-    } else if (keyCode == 119) {
+    } else if (keyCode == 119 && angleX > angleMin) {
         angleX -= angleChange;
-    } else if (keyCode == 100) {
+    } else if (keyCode == 100 && angleY < angleMax) {
         angleY += angleChange;
-    } else if (keyCode == 97) {
+    } else if (keyCode == 97 && angleY > angleMin) {
         angleY -= angleChange;
->>>>>>> dd46097ae5e115808263c5590240644fd9d7eafe
     }
 }
 
