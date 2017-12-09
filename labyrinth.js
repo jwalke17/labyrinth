@@ -31,7 +31,7 @@ function initMaze() {
     var predictability = 2;
 
     var textureLoader = new THREE.TextureLoader();
-    var woodTexture = textureLoader.load( "wood.jpg" );
+    var woodTexture = textureLoader.load( "textures/wood.jpg" );
     woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
 
     var woodMaterial = new THREE.MeshPhongMaterial({map: woodTexture});
@@ -126,28 +126,12 @@ function initTHREE() {
     renderer = new THREE.WebGLRenderer({canvas: canvas });
     renderer.setSize(width, height);
 
-    var light = new THREE.PointLight(0xFFFFFF, 1, 1000);
-    light.position.set(0, 0, 8);
+    var light = new THREE.PointLight(0xFFFFFF, 1, 100);
+    light.position.set(0, 0, 20);
     scene.add(light);
-    
-    var light2 = new THREE.PointLight(0xFFFFCF, 1, 100);
-    light2.position.set(0, 0, 2);
+
+    var light2 = new THREE.AmbientLight(0x222222);
     scene.add(light2);
-
-    var light3 = new THREE.AmbientLight(0x222222);
-    scene.add(light3);
-
-    var controls = new THREE.OrbitControls(camera, renderer.domElement);
-    /*var controls = new THREE.TrackballControls( camera );
-    controls.rotateSpeed = 1.0;
-    controls.zoomSpeed = 1.2;
-    controls.panSpeed = 0.8;
-    controls.noZoom = false;
-    controls.noPan = false;
-    controls.staticMoving = true;
-    controls.dynamicDampingFactor = 0.3;
-    controls.keys = [ 65, 83, 68 ];
-    controls.addEventListener( 'change', render );*/
 }
 
 function animate(){
@@ -156,7 +140,7 @@ function animate(){
 }
 
 function keyPressHandler(e) {
-    var angleChange = 0.02, angleMax = 0.1, angleMin = -0.1;
+    var angleChange = 0.002, angleMax = 0.1, angleMin = -0.1;
     var keyCode = e.keyCode ? e.keyCode : e.which;
 
     if (keyCode == 115 && angleX < angleMax) {
