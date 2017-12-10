@@ -365,9 +365,6 @@ function render(){
         alert("Congratulations! You won!");
         location.reload();
     }
-    if (ballMesh.position.z < -10) {
-        ballMesh.position.z = 0.5;
-    }
 }
 
 function newZDepthfromWidth(width, cam){
