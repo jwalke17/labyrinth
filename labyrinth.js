@@ -126,7 +126,11 @@ function initTHREE(canvas_id) {
     scene = new Physijs.Scene();
     scene.setGravity(new THREE.Vector3(0, 0, -10));
     camera = new THREE.PerspectiveCamera( 100, width / height, 1, 1000 );
-    camera.position.z = 5;
+    if (width < height){
+        camera.position.z = newZDepthfromWidth(size[0] + .25, camera);
+    } else {
+        camera.position.z = 5;
+    }
     renderer = new THREE.WebGLRenderer({canvas: canvas });
     renderer.setSize(width, height);
 
@@ -355,25 +359,7 @@ function render(){
     }
 }
 
-/* 
-Function snatched from:
-https://discourse.threejs.org/t/functions-to-calculate-the-visible-width-height-at-a-given-z-depth-from-a-perspective-camera/269
-*/
-
-function visibleHeightAtZDepth( depth, camera ){
-  // compensate for cameras not positioned at z=0
-    cameraOffset = camera.position.z;
-    if ( depth < cameraOffset ) depth -= cameraOffset;
-    else depth += cameraOffset;
-
-  // vertical fov in radians
-    vFOV = camera.fov * Math.PI / 180; 
-
-  // Math.abs to ensure the result is always positive
-    return 2 * Math.tan( vFOV / 2 ) * Math.abs( depth );
-};
-
-function visibleWidthAtZDepth ( depth, camera ) {
-  height = visibleHeightAtZDepth( depth, camera );
-  return height * camera.aspect;
-};
+function newZDepthfromWidth(width, cam){
+    var height = ((width/2) + 1) / cam.aspect;
+    return height / (Math.tan( (cam.fov * Math.PI / 180) / 2) );
+}
