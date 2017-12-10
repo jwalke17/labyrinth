@@ -156,6 +156,33 @@ function keyPressHandler(e) {
     }
 }
 
+var additional_screen_rotation = null;
+function addExtraScreenRot() {
+    if(additional_screen_rotation==null) {
+        additional_screen_rotation = getURLParameter("dev_rot");
+        if(additional_screen_rotation==null) {
+            additional_screen_rotation = 0;
+        } else {
+            additional_screen_rotation = parseInt(additional_screen_rotation);
+        }
+    }
+    var old_rot = additional_screen_rotation;
+    additional_screen_rotation = additional_screen_rotation + 90;
+    while(additional_screen_rotation>=360) {
+        additional_screen_rotation = additional_screen_rotation - 360;
+    }
+    var sep = "?";
+    if(location.href.indexOf("?") !== -1) {
+        var sep = "&";
+    }
+    if(location.href.indexOf("dev_rot=") !== -1) {
+        var pos=location.href.indexOf("dev_rot=");
+        location.href = location.href.substr(0,pos) + "dev_rot="+additional_screen_rotation + location.href.substr(pos+(("dev_rot="+old_rot).length),location.href.length);
+    } else {
+        location.href = location.href + sep+"dev_rot="+additional_screen_rotation;
+    }
+}
+
 function rotationHandler(e) {
     var angleMax = 0.1, angleMin = -0.1;
     var deg2rad = Math.PI/180;
@@ -193,6 +220,18 @@ function rotationHandler(e) {
             break;
         default:
             break;
+    }
+    if(additional_screen_rotation==null) {
+        additional_screen_rotation = getURLParameter("dev_rot");
+        if(additional_screen_rotation==null) {
+            additional_screen_rotation = 0;
+        } else {
+            additional_screen_rotation = parseInt(additional_screen_rotation);
+        }
+    }
+    var added_rot = 0;
+    for(added_rot=0;added_rot<additional_screen_rotation;added_rot=added_rot+90) {
+        tempGimbalRot = rot_90(tempGimbalRot);
     }
     if(ensureDeviceStartsFlat(tempGimbalRot)) {
         gimbalRot = tempGimbalRot;
