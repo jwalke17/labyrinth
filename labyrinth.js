@@ -173,6 +173,27 @@ function rotationHandler(e) {
     if (tempGimbalRot[1] < angleMin) {
         tempGimbalRot[1] = angleMin;
     }
+    var orient = null;
+    if(screen.msOrientation!=undefined) {
+        orient = screen.msOrientation;
+    } else if(screen.orientation!=undefined) {
+        orient = screen.orientation.type;
+    }
+    switch(screen.msOrientation) {
+        case "landscape-primary":
+            break;
+        case "portrait-secondary":
+        tempGimbalRot = rot_90(tempGimbalRot);
+            break;
+        case "landscape-secondary":
+        tempGimbalRot = rot_90(rot_90(tempGimbalRot));
+            break;
+        case "portrait-primary":
+        tempGimbalRot = rot_90(rot_90(rot_90(tempGimbalRot)));
+            break;
+        default:
+            break;
+    }
     if(ensureDeviceStartsFlat(tempGimbalRot)) {
         gimbalRot = tempGimbalRot;
     }
