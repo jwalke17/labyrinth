@@ -205,8 +205,23 @@ function rotationHandler(e) {
         orient = screen.msOrientation;
     } else if(screen.orientation!=undefined) {
         orient = screen.orientation.type;
+    } else if(window.orientation!=undefined) {
+        switch(window.orientation) {
+            case 0:
+                orient = "portrait-primary";
+                break;
+            case 90:
+                orient = "landscape-primary";
+                break;
+            case 180:
+                orient = "portrait-secondary";
+                break;
+            case -90:
+                orient = "landscape-secondary";
+                break;
+        }
     }
-    switch(screen.msOrientation) {
+    switch(orient) {
         case "portrait-primary":
             break;
         case "landscape-primary":
