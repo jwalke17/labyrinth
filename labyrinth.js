@@ -20,6 +20,7 @@ window.onload = function init(){
     initMaze();
     document.addEventListener("keypress", keyPressHandler, false);
     window.addEventListener("deviceorientation", rotationHandler, true);
+    window.addEventListener("resize", function() {resetSize(canvas_id);}, true);
     
     render();
     alert("Get the ball to the bottom-right corner using the WASD keys (or device tilt on mobile)!\n\nGood luck!");
@@ -121,18 +122,9 @@ function calculateVertices(geometry, points, thickness, bottom, top){
 function initTHREE(canvas_id) {
 
     var canvas = document.getElementById(canvas_id);
-    var height = window.innerHeight;
-    var width = window.innerWidth;
     scene = new Physijs.Scene();
     scene.setGravity(new THREE.Vector3(0, 0, -10));
-    camera = new THREE.PerspectiveCamera( 100, width / height, 1, 1000 );
-    if (width < height){
-        camera.position.z = newZDepthfromWidth(size[0] + .25, camera);
-    } else {
-        camera.position.z = 5;
-    }
     renderer = new THREE.WebGLRenderer({canvas: canvas });
-    renderer.setSize(width, height);
 
     var light = new THREE.PointLight(0xFFFFFF, 1, 100);
     light.position.set(0, 0, 20);
@@ -140,6 +132,22 @@ function initTHREE(canvas_id) {
 
     var light2 = new THREE.AmbientLight(0x222222);
     scene.add(light2);
+    resetSize(canvas_id);
+}
+
+function resetSize(canvas_id) {
+    var canvas = document.getElementById(canvas_id);
+    var height = window.innerHeight;
+    var width = window.innerWidth;
+    canvas.height = height;
+    canvas.width = width;
+    camera = new THREE.PerspectiveCamera( 100, width / height, 1, 1000 );
+    if (width < height){
+        camera.position.z = newZDepthfromWidth(size[0] + .25, camera);
+    } else {
+        camera.position.z = 5;
+    }
+    renderer.setSize(width, height);
 }
 
 function animate(){
