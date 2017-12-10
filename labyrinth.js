@@ -265,7 +265,7 @@ function ensureDeviceStartsFlat(rot) {
                         return false;
                     }
                 }
-                if(!confirm("Please lay device flat, then press \"OK\" to begin.\nIf playing with keyboard, click on \"Cancel.\"")) {
+                if(!confirm("Please lay device flat, then press \"OK\" to begin.\nIf playing with keyboard, click on \"Cancel\" to disable tilt.")) {
                     selectedKeyboardOnly = true;
                     if(location.href.indexOf("?") !== -1) {
                         location.href = location.href + "&kbd_only=yes";
