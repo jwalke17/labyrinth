@@ -19,7 +19,9 @@ window.onload = function init(){
     initMaze();
     document.addEventListener("keypress", keyPressHandler, false);
     window.addEventListener("deviceorientation", rotationHandler, true);
-
+    
+    render();
+    alert("Get the ball to the bottom-right corner using the WASD keys (or device tilt on mobile)!\n\nGood luck!");
     animate();
 }
 
@@ -142,7 +144,7 @@ function animate(){
 }
 
 function keyPressHandler(e) {
-    var angleChange = 0.002, angleMax = 0.1, angleMin = -0.1;
+    var angleChange = 0.005, angleMax = 0.1, angleMin = -0.1;
     var keyCode = e.keyCode ? e.keyCode : e.which;
 
     if (keyCode == 115 && keyRot[0] < angleMax) {
