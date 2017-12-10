@@ -9,6 +9,7 @@ var camera;
 var baseMesh;
 var wallsMesh = [];
 var ballMesh;
+var size = [10.0, 10.0, .5];
 
 var keyRot = [0,0];
 var gimbalRot = [0,0];
@@ -26,7 +27,6 @@ window.onload = function init(){
 }
 
 function initMaze() {
-    var size = [10.0, 10.0, .5];
     var wallThickness = .15;
     var wallHeight = .1;
     var gapWidth = .4;
@@ -330,3 +330,26 @@ function render(){
         location.reload();
     }
 }
+
+/* 
+Function snatched from:
+https://discourse.threejs.org/t/functions-to-calculate-the-visible-width-height-at-a-given-z-depth-from-a-perspective-camera/269
+*/
+
+function visibleHeightAtZDepth( depth, camera ){
+  // compensate for cameras not positioned at z=0
+    cameraOffset = camera.position.z;
+    if ( depth < cameraOffset ) depth -= cameraOffset;
+    else depth += cameraOffset;
+
+  // vertical fov in radians
+    vFOV = camera.fov * Math.PI / 180; 
+
+  // Math.abs to ensure the result is always positive
+    return 2 * Math.tan( vFOV / 2 ) * Math.abs( depth );
+};
+
+function visibleWidthAtZDepth ( depth, camera ) {
+  height = visibleHeightAtZDepth( depth, camera );
+  return height * camera.aspect;
+};
