@@ -11,11 +11,14 @@ var wallsMesh = [];
 var ballMesh;
 
 var keyRot = [0,0];
+var gimbalRot = [0,0];
 
 window.onload = function init(){
-    initTHREE();
+    var canvas_id = "my_canvas";
+    initTHREE(canvas_id);
     initMaze();
     document.addEventListener("keypress", keyPressHandler, false);
+    window.addEventListener("deviceorientation", rotationHandler, true);
 
     animate();
 }
@@ -113,9 +116,9 @@ function calculateVertices(geometry, points, thickness, bottom, top){
     );
 }
 
-function initTHREE() {
+function initTHREE(canvas_id) {
 
-    var canvas = document.getElementById("my_canvas");
+    var canvas = document.getElementById(canvas_id);
     var height = window.innerHeight;
     var width = window.innerWidth;
     scene = new Physijs.Scene();
@@ -153,6 +156,74 @@ function keyPressHandler(e) {
     }
 }
 
+function rotationHandler(e) {
+    var angleMax = 0.1, angleMin = -0.1;
+    var deg2rad = Math.PI/180;
+    var scale = 0.1;
+    var tempGimbalRot = [e.beta*deg2rad*scale,e.gamma*deg2rad*scale];
+    if (tempGimbalRot[0] > angleMax) {
+        tempGimbalRot[0] = angleMax;
+    }
+    if (tempGimbalRot[0] < angleMin) {
+        tempGimbalRot[0] = angleMin;
+    }
+    if (tempGimbalRot[1] > angleMax) {
+        tempGimbalRot[1] = angleMax;
+    }
+    if (tempGimbalRot[1] < angleMin) {
+        tempGimbalRot[1] = angleMin;
+    }
+    if(ensureDeviceStartsFlat(tempGimbalRot)) {
+        gimbalRot = tempGimbalRot;
+    }
+}
+
+function getURLParameter(name) {
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
+}
+
+var firstGimbalValueSet = false;
+var deviceEnsuredFlat = false;
+var selectedKeyboardOnly = false;
+function ensureDeviceStartsFlat(rot) {
+    var angleMax = 0.04, angleMin = -0.04;
+    if(rot!=[0,0]) {
+        firstGimbalValueSet = true;
+    }
+    if(selectedKeyboardOnly) {
+        return false;
+    }
+    if(firstGimbalValueSet) {
+        if(deviceEnsuredFlat) {
+            return true;
+        } else {
+            if ((rot[0] > angleMax) || (rot[0] < angleMin) || (rot[1] > angleMax) || (rot[1] < angleMin)) {
+                var kbdOnlyParam = getURLParameter("kbd_only");
+                if(kbdOnlyParam!=null) {
+                    if(kbdOnlyParam=="yes" || kbdOnlyParam=="true") {
+                        selectedKeyboardOnly = true;
+                        return false;
+                    }
+                }
+                if(!confirm("Please lay device flat, then press \"OK\" to begin.\nIf playing with keyboard, click on \"Cancel.\"")) {
+                    selectedKeyboardOnly = true;
+                    if(location.href.indexOf("?") !== -1) {
+                        location.href = location.href + "&kbd_only=yes";
+                    } else {
+                        location.href = location.href + "?kbd_only=yes";
+                    }
+                }
+                return false;
+            } else {
+                deviceEnsuredFlat = true;
+                return true;
+            }
+        }
+    } else {
+        return false;
+    }
+}
+
 function getCameraRotAndPos(pos_z,rot) {
     var pos = [0,0];
     if(Math.tan(rot[1])!=0) {
@@ -169,7 +240,7 @@ function getKeyRot() {
 }
 
 function getGimbalRot() {
-    return [0,0];
+    return gimbalRot;
 }
 
 function getMeshRot() {
@@ -181,9 +252,10 @@ function getCameraRot() {
 }
 
 function render(){
-    [baseMesh.rotation.x,baseMesh.rotation.y] = getMeshRot();
+    var mesh_rot = getMeshRot();
+    [baseMesh.rotation.x,baseMesh.rotation.y] = mesh_rot;
     baseMesh.__dirtyRotation = true;
-    [ballMesh.rotation.x,ballMesh.rotation.y] = getMeshRot();
+    [ballMesh.rotation.x,ballMesh.rotation.y] = mesh_rot;
     ballMesh.__dirtyRotation = true;
 
     [[camera.rotation.x,camera.rotation.y],[camera.position.x,camera.position.y]] = getCameraRotAndPos(camera.position.z,getCameraRot());
