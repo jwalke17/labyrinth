@@ -207,8 +207,23 @@ function rotationHandler(e) {
         orient = screen.msOrientation;
     } else if(screen.orientation!=undefined) {
         orient = screen.orientation.type;
+    } else if(window.orientation!=undefined) {
+        switch(window.orientation) {
+            case 0:
+                orient = "portrait-primary";
+                break;
+            case 90:
+                orient = "landscape-primary";
+                break;
+            case 180:
+                orient = "portrait-secondary";
+                break;
+            case -90:
+                orient = "landscape-secondary";
+                break;
+        }
     }
-    switch(screen.msOrientation) {
+    switch(orient) {
         case "portrait-primary":
             break;
         case "landscape-primary":
@@ -244,9 +259,15 @@ function getURLParameter(name) {
     return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search) || [null, ''])[1].replace(/\+/g, '%20')) || null;
 }
 
+function getCurrentTime() {
+    var d = new Date();
+    return d.getTime();
+}
+
 var firstGimbalValueSet = false;
 var deviceEnsuredFlat = false;
 var selectedKeyboardOnly = false;
+var prev_confirmation = getCurrentTime();
 function ensureDeviceStartsFlat(rot) {
     var angleMax = 0.04, angleMin = -0.04;
     if(rot!=[0,0]) {
@@ -267,13 +288,16 @@ function ensureDeviceStartsFlat(rot) {
                         return false;
                     }
                 }
-                if(!confirm("Please lay device flat, then press \"OK\" to begin.\nIf playing with keyboard, click on \"Cancel\" to disable tilt.")) {
-                    selectedKeyboardOnly = true;
-                    if(location.href.indexOf("?") !== -1) {
-                        location.href = location.href + "&kbd_only=yes";
-                    } else {
-                        location.href = location.href + "?kbd_only=yes";
+                if((getCurrentTime()-prev_confirmation)>500) {
+                    if(!confirm("Please lay device flat, then press \"OK\" to begin.\nIf playing with keyboard, click on \"Cancel\" to disable tilt.")) {
+                        selectedKeyboardOnly = true;
+                        if(location.href.indexOf("?") !== -1) {
+                            location.href = location.href + "&kbd_only=yes";
+                        } else {
+                            location.href = location.href + "?kbd_only=yes";
+                        }
                     }
+                    prev_confirmation = getCurrentTime();
                 }
                 return false;
             } else {
