@@ -10,8 +10,7 @@ var baseMesh;
 var wallsMesh = [];
 var ballMesh;
 
-var angleX = 0;
-var angleY = 0;
+var keyRot = [0,0];
 
 window.onload = function init(){
     initTHREE();
@@ -143,23 +142,51 @@ function keyPressHandler(e) {
     var angleChange = 0.002, angleMax = 0.1, angleMin = -0.1;
     var keyCode = e.keyCode ? e.keyCode : e.which;
 
-    if (keyCode == 115 && angleX < angleMax) {
-        angleX += angleChange;
-    } else if (keyCode == 119 && angleX > angleMin) {
-        angleX -= angleChange;
-    } else if (keyCode == 100 && angleY < angleMax) {
-        angleY += angleChange;
-    } else if (keyCode == 97 && angleY > angleMin) {
-        angleY -= angleChange;
+    if (keyCode == 115 && keyRot[0] < angleMax) {
+        keyRot[0] += angleChange;
+    } else if (keyCode == 119 && keyRot[0] > angleMin) {
+        keyRot[0] -= angleChange;
+    } else if (keyCode == 100 && keyRot[1] < angleMax) {
+        keyRot[1] += angleChange;
+    } else if (keyCode == 97 && keyRot[1] > angleMin) {
+        keyRot[1] -= angleChange;
     }
 }
 
+function getCameraRotAndPos(pos_z,rot) {
+    var pos = [0,0];
+    if(Math.tan(rot[1])!=0) {
+        pos[0] = pos_z * Math.tan(rot[1]);
+    }
+    if(Math.tan(rot[0])!=0) {
+        pos[1] = -1 * pos_z * Math.tan(rot[0]);
+    }
+    return [rot,pos];
+}
+
+function getKeyRot() {
+    return keyRot;
+}
+
+function getGimbalRot() {
+    return [0,0];
+}
+
+function getMeshRot() {
+    return add_vect(getKeyRot(),getGimbalRot());
+}
+
+function getCameraRot() {
+    return mult_vect(getGimbalRot(),1.0);
+}
+
 function render(){
-    baseMesh.rotation.set(angleX, angleY, 0);
+    [baseMesh.rotation.x,baseMesh.rotation.y] = getMeshRot();
     baseMesh.__dirtyRotation = true;
-    
-    ballMesh.rotation.set(angleX, angleY, 0);
+    [ballMesh.rotation.x,ballMesh.rotation.y] = getMeshRot();
     ballMesh.__dirtyRotation = true;
+
+    [[camera.rotation.x,camera.rotation.y],[camera.position.x,camera.position.y]] = getCameraRotAndPos(camera.position.z,getCameraRot());
 
     scene.simulate();
     renderer.render(scene, camera);
