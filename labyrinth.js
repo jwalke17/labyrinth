@@ -167,7 +167,7 @@ function addExtraScreenRot() {
         }
     }
     var old_rot = additional_screen_rotation;
-    additional_screen_rotation = additional_screen_rotation + 90;
+    additional_screen_rotation = additional_screen_rotation + 270;
     while(additional_screen_rotation>=360) {
         additional_screen_rotation = additional_screen_rotation - 360;
     }
@@ -207,15 +207,15 @@ function rotationHandler(e) {
         orient = screen.orientation.type;
     }
     switch(screen.msOrientation) {
-        case "landscape-primary":
+        case "portrait-primary":
             break;
-        case "portrait-secondary":
+        case "landscape-primary":
         tempGimbalRot = rot_90(tempGimbalRot);
             break;
-        case "landscape-secondary":
+        case "portrait-secondary":
         tempGimbalRot = rot_90(rot_90(tempGimbalRot));
             break;
-        case "portrait-primary":
+        case "landscape-secondary":
         tempGimbalRot = rot_90(rot_90(rot_90(tempGimbalRot)));
             break;
         default:
