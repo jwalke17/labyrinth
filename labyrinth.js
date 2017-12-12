@@ -346,7 +346,7 @@ function getMeshRot() {
 }
 
 function getCameraRot() {
-    return mult_vect(getGimbalRot(),1.0);
+    return mult_vect(getGimbalRot(),0.25);
 }
 
 function render(){
